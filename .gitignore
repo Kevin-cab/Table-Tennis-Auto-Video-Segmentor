@@ -1,0 +1,6 @@
+# Virtual environment
+.venv312/
+
+# Video data folders
+video_data/raw_videos/*
+video_data/video_segments/*
