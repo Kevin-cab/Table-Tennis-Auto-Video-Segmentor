@@ -1,3 +1,30 @@
+import subprocess
+import sys
+
+def auto_install_packages():
+    """Automatically install required packages if they're missing."""
+    required_packages = {
+        'cv2': 'opencv-python',
+        'imagehash': 'imagehash',
+        'numpy': 'numpy',
+        'PIL': 'Pillow'
+    }
+    
+    for module_name, package_name in required_packages.items():
+        try:
+            __import__(module_name)
+        except ImportError:
+            print(f"Installing {package_name}...")
+            try:
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', package_name])
+                print(f"Successfully installed {package_name}")
+            except subprocess.CalledProcessError:
+                print(f"Failed to install {package_name}. Please install manually: pip install {package_name}")
+                sys.exit(1)
+
+# Auto-install required packages
+auto_install_packages()
+
 import cv2
 import imagehash
 import numpy as np
