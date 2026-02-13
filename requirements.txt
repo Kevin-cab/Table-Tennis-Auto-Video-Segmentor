@@ -1,0 +1,56 @@
+# Video Segmentation & Filtering Pipeline Dependencies
+# Install all packages: pip install -r requirements.txt
+
+# Core Computer Vision & Image Processing
+opencv-python>=4.8.0        # cv2 - video processing, optical flow
+numpy>=1.24.0               # numerical operations, arrays
+Pillow>=10.0.0             # PIL - image handling
+
+# Deep Learning (PyTorch)
+torch>=2.0.0               # CNN embeddings for slow-mo detection
+torchvision>=0.15.0        # ResNet50 model and transforms
+
+# Video Scene Detection
+scenedetect[opencv]>=0.6.0  # PySceneDetect - scene segmentation
+
+# Image Hashing for Static Ad Detection
+imagehash>=4.3.0           # perceptual hashing (pHash)
+
+# Data Processing
+pandas>=2.0.0              # CSV handling, data analysis
+
+# =============================================================================
+# STANDARD LIBRARY (no install needed - included with Python)
+# =============================================================================
+# os - file/directory operations
+# glob - file pattern matching
+# math - mathematical operations
+# itertools - iteration utilities
+# shutil - file moving/copying
+
+# =============================================================================
+# OPTIONAL: GPU Support (already installed with torch if CUDA available)
+# =============================================================================
+# For GPU acceleration (PyTorch CUDA):
+#   - Install CUDA-enabled PyTorch from: https://pytorch.org/get-started/locally/
+#   - Example: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+# =============================================================================
+# SYSTEM REQUIREMENTS
+# =============================================================================
+# - Python 3.8 or higher
+# - FFmpeg (required by PySceneDetect for video splitting)
+#   Install: https://ffmpeg.org/download.html
+#   Add to system PATH after installation
+
+# =============================================================================
+# USAGE
+# =============================================================================
+# Install all dependencies:
+#   pip install -r requirements.txt
+#
+# Verify installation:
+#   python -c "import cv2, torch, scenedetect, imagehash, pandas; print('All packages installed!')"
+#
+# Check GPU availability:
+#   python -c "import torch; print('CUDA available:', torch.cuda.is_available())"

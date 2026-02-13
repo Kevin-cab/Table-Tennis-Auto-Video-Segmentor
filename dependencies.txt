@@ -1,0 +1,197 @@
+# =============================================================================
+# COMPLETE DEPENDENCY LIST FOR VIDEO SEGMENTATION PIPELINE
+# =============================================================================
+# This file lists ALL dependencies from all 3 main files:
+#   1. segmentor.py
+#   2. static_ad_remover.py
+#   3. slowmo_remover.py
+#
+# Use requirements.txt for pip installation
+# =============================================================================
+
+# =============================================================================
+# FILE: segmentor.py
+# =============================================================================
+# Standard Library:
+  - os                   # file/directory operations
+  - glob                 # file pattern matching (*.mp4, etc.)
+  - math                 # mathematical operations (unused but imported)
+  - itertools            # grouping operations for fade detection
+  - shutil               # file moving operations (removed clips)
+
+# Third-Party Packages:
+  - opencv-python        # cv2 - video capture, histogram computation, frame processing
+  - numpy                # numerical arrays, histogram correlation
+  - pandas               # CSV file handling, segment data management
+  - scenedetect          # PySceneDetect - SceneManager, open_video, FrameTimecode
+  - scenedetect          # ContentDetector, ThresholdDetector, AdaptiveDetector, HistogramDetector
+  - scenedetect          # split_video_ffmpeg - video cutting
+
+# Custom Modules (must exist in same directory):
+  - static_ad_remover    # is_static_ad function
+  - slowmo_remover       # is_slow_motion function, SLOWMO_SHOT_REMOVE_THRESHOLD constant
+
+
+# =============================================================================
+# FILE: static_ad_remover.py
+# =============================================================================
+# Standard Library:
+  - None
+
+# Third-Party Packages:
+  - opencv-python        # cv2 - video capture, frame resizing, color conversion, pixel difference
+  - imagehash            # perceptual hashing (pHash) for frame comparison
+  - numpy                # array operations, mean calculations
+  - Pillow               # PIL.Image - image format conversion for pHash
+
+
+# =============================================================================
+# FILE: slowmo_remover.py
+# =============================================================================
+# Standard Library:
+  - None
+
+# Third-Party Packages:
+  - opencv-python        # cv2 - video capture, optical flow (Farneback), frame processing
+  - numpy                # array operations, cosine similarity, statistics
+  - torch                # PyTorch - device management (CPU/GPU), tensor operations
+  - torchvision          # models.resnet50 - CNN feature extraction
+  - torchvision          # transforms - image preprocessing for ResNet50
+  - Pillow               # PIL.Image - frame format conversion
+
+
+# =============================================================================
+# COMPLETE PACKAGE LIST (Unique, Install via pip)
+# =============================================================================
+# 1. opencv-python       # Used by: ALL 3 files
+# 2. numpy               # Used by: ALL 3 files
+# 3. pandas              # Used by: segmentor.py
+# 4. scenedetect         # Used by: segmentor.py
+# 5. imagehash           # Used by: static_ad_remover.py
+# 6. Pillow              # Used by: static_ad_remover.py, slowmo_remover.py
+# 7. torch               # Used by: slowmo_remover.py
+# 8. torchvision         # Used by: slowmo_remover.py
+
+
+# =============================================================================
+# STANDARD LIBRARY MODULES (No Installation Needed)
+# =============================================================================
+# - os
+# - glob
+# - math
+# - itertools
+# - shutil
+
+
+# =============================================================================
+# EXTERNAL SYSTEM REQUIREMENTS
+# =============================================================================
+# FFmpeg:
+#   - Required by: PySceneDetect (split_video_ffmpeg function)
+#   - Purpose: Video splitting/cutting
+#   - Installation: Download from https://ffmpeg.org/download.html
+#   - Must be added to system PATH
+#
+# CUDA Toolkit (Optional):
+#   - Required by: PyTorch (for GPU acceleration)
+#   - Purpose: GPU-accelerated ResNet50 inference in slowmo_remover.py
+#   - Installation: https://developer.nvidia.com/cuda-downloads
+#   - Note: slowmo_remover.py automatically falls back to CPU if CUDA unavailable
+
+
+# =============================================================================
+# PACKAGE USAGE BREAKDOWN
+# =============================================================================
+
+opencv-python:
+  segmentor.py:
+    - cv2.VideoCapture()         # read video frames
+    - cv2.resize()               # downscale frames for faster processing
+    - cv2.calcHist()             # compute 3D color histograms
+    - cv2.normalize()            # normalize histograms
+    - cv2.compareHist()          # histogram correlation for fade detection
+    - cv2.cvtColor()             # BGR to YUV conversion for luminance
+  
+  static_ad_remover.py:
+    - cv2.VideoCapture()         # read video frames
+    - cv2.cvtColor()             # BGR to RGB conversion
+    - cv2.resize()               # downscale frames
+    - cv2.absdiff()              # pixel difference calculation
+  
+  slowmo_remover.py:
+    - cv2.VideoCapture()         # read video frames
+    - cv2.cvtColor()             # BGR to RGB/grayscale conversion
+    - cv2.resize()               # downscale frames for optical flow
+    - cv2.calcOpticalFlowFarneback()  # dense optical flow computation
+    - cv2.cartToPolar()          # flow magnitude calculation
+
+numpy:
+  segmentor.py:
+    - np.array()                 # array conversions
+    - np.mean()                  # luminance averaging
+    - np.convolve()              # correlation smoothing
+    - np.argmin()                # find darkest frame
+  
+  static_ad_remover.py:
+    - np.mean()                  # pixel difference averaging
+  
+  slowmo_remover.py:
+    - np.array()                 # array conversions
+    - np.dot()                   # cosine similarity calculation
+    - np.mean()                  # flow statistics
+    - np.sqrt()                  # flow normalization
+    - np.std()                   # standard deviation (for diagnostics)
+
+torch:
+  slowmo_remover.py:
+    - torch.device()             # CPU/GPU device selection
+    - torch.nn.Sequential()      # model wrapper
+    - torch.nn.functional.normalize()  # L2 normalization
+    - torch.stack()              # batch tensor creation
+    - torch.no_grad()            # disable gradient computation
+
+torchvision:
+  slowmo_remover.py:
+    - models.resnet50()          # pretrained ResNet50 model
+    - transforms.Compose()       # image preprocessing pipeline
+    - transforms.Resize()        # resize to 224x224
+    - transforms.ToTensor()      # convert to tensor
+    - transforms.Normalize()     # ImageNet normalization
+
+scenedetect:
+  segmentor.py:
+    - SceneManager               # scene detection orchestrator
+    - open_video()               # video stream opener
+    - FrameTimecode              # timecode/frame conversion
+    - ContentDetector            # detect cuts based on content changes
+    - ThresholdDetector          # detect fades to/from black
+    - AdaptiveDetector           # adaptive content detection
+    - HistogramDetector          # detect dissolves/cross-fades
+    - split_video_ffmpeg()       # split video into segments
+
+pandas:
+  segmentor.py:
+    - pd.DataFrame()             # create tables from segment data
+    - pd.read_csv()              # read existing segment CSVs
+    - pd.concat()                # combine multiple CSVs
+    - df.to_csv()                # save segment data to CSV
+
+imagehash:
+  static_ad_remover.py:
+    - imagehash.phash()          # compute perceptual hash of frames
+
+Pillow:
+  static_ad_remover.py:
+    - Image.fromarray()          # convert numpy array to PIL Image
+  
+  slowmo_remover.py:
+    - Image.fromarray()          # convert numpy array to PIL Image
+
+
+# =============================================================================
+# INSTALLATION COMMAND
+# =============================================================================
+# pip install -r requirements.txt
+#
+# Or manually:
+# pip install opencv-python numpy pandas scenedetect[opencv] imagehash Pillow torch torchvision
